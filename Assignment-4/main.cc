@@ -23,7 +23,7 @@ throughput (in Kbps) observed with different packet sizes.
 Authors:
 
 170101087: SIDDHARTH AGARWAL 
-170101036: MANI MANNAMPALI 
+170101036: MANI MANNAMPALLI 
 170101068: SUNNY KUMAR
 
 ********************************************************************************************************************
@@ -72,6 +72,13 @@ NS_LOG_COMPONENT_DEFINE ("main1");
 std::map<std::string, double> mapBytesReceivedIPV4, mapMaxThroughput;
 double printGap = 0;
 
+uint max(uint a,uint b)
+{
+	if(a<b)
+		return a;
+	return b;
+}
+
 int main (int argc, char *argv[])
 {
 
@@ -79,7 +86,7 @@ int main (int argc, char *argv[])
 	uint32_t port;
 	uint32_t packetsize = 1024;
 	uint32_t run_time = 1;
-	uint32_t for_loop = 1;
+	uint32_t for_loop = 5;
 
 	bool simultaneously = false;
     std::string prot = "TcpHighSpeed";
@@ -92,6 +99,21 @@ int main (int argc, char *argv[])
     cmd.AddValue ("simultaneously", "run_time in factor of 5", simultaneously);
 
     cmd.Parse (argc, argv);
+
+    std::cout<<"Command line Arguments:\n";		
+	std::cout<<"packetsize: "<<packetsize<<"\n";
+	std::cout<<"prot: "<<prot<<"\n";
+	std::cout<<"run time: "<<run_time<<"\n";
+	std::cout<<"for_loop: "<<for_loop<<"\n";
+	std::cout<<"simultaneously: "<<simultaneously<<"\n";
+	
+
+
+   /* //Setting minimum value for attributes
+    run_time=max(run_time,1);
+    for_loop=max(for_loop,1);
+    packetsize=max(100,packetsize);
+    maxBytes=max(1000,maxBytes);*/
 
 
     if (prot.compare ("TcpScalable") == 0)
@@ -193,18 +215,22 @@ int main (int argc, char *argv[])
 
 		//printing ips
 		std::cout << "Assigned IPs to Receivers:" << std::endl;
-		std::cout<<i3i4.GetAddress(0)<<std::endl;
-		std::cout<<i3i4.GetAddress(1)<<std::endl;
-		std::cout<<i3i5.GetAddress(0)<<std::endl;
-		std::cout<<i3i5.GetAddress(1)<<std::endl;
+		
+		std::cout<<"H3: "<<i3i4.GetAddress(1)<<std::endl;
+		
+		std::cout<<"H4: "<<i3i5.GetAddress(1)<<std::endl;
 		std::cout << "Assigned IPs to Senders:" << std::endl;
-		std::cout<< i0i2.GetAddress(0)<<std::endl;
-		std::cout<< i0i2.GetAddress(1)<<std::endl;
-		std::cout<< i1i2.GetAddress(0)<<std::endl;
-		std::cout<< i1i2.GetAddress(1)<<std::endl;
+		std::cout<<"H1: "<< i0i2.GetAddress(0)<<std::endl;
+		
+		std::cout<<"H2: "<< i1i2.GetAddress(0)<<std::endl;
+		
 		std::cout << "Assigned IPs to Router:" << std::endl;
-		std::cout<< i2i3.GetAddress(0)<<std::endl;
-		std::cout<< i2i3.GetAddress(1)<<std::endl;
+		std::cout<<"R2<--H3: "<<i3i4.GetAddress(0)<<std::endl;
+		std::cout<<"R2<--H4: "<<i3i5.GetAddress(0)<<std::endl;
+		std::cout<<"R1<--H1: "<< i0i2.GetAddress(1)<<std::endl;
+		std::cout<<"R1<--H2: "<< i1i2.GetAddress(1)<<std::endl;
+		std::cout<<"R1<--R2: "<< i2i3.GetAddress(0)<<std::endl;
+		std::cout<<"R1-->R2: "<< i2i3.GetAddress(1)<<std::endl;
 		
 
 		//printing routing tables for the all the nodes in the container
@@ -219,13 +245,13 @@ int main (int argc, char *argv[])
 		*/
 		port = 9;  
 
-		// on off helper is for CBR traffic, we tell INET socket address here that receiver is receiver 1
+		// on off helper is for CBR traffic, we tell INET socket address here that receiver is HOST-3
 		OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (i3i4.GetAddress (1), port)));
 		// onoff.SetConstantRate (DataRate ("10000kb/s"),udpPacketSize);
 	    onoff.SetAttribute ("PacketSize", UintegerValue (udpPacketSize));
 
 		
-		//install the on off app on sender 1 and run for 1-5 seconds
+		//install the on off app on HOST-1 and run for 1-5 seconds
 		ApplicationContainer udp_apps_s = onoff.Install (n0n2.Get (0));
 		
 		//runtime =  (total time of simulation in multiple of 10 for given packet size) 
@@ -244,7 +270,7 @@ int main (int argc, char *argv[])
 		// Create a packet sink to receive these packets from any ip address. 
 		PacketSinkHelper sink_udp ("ns3::UdpSocketFactory",Address (InetSocketAddress (Ipv4Address::GetAny (), port)));
 
-		// install the reciver at reciever 1 
+		// install the reciver at HOST-3
 		ApplicationContainer udp_apps_d = sink_udp.Install (n3n4.Get (1));
 
 		if(simultaneously==false)
@@ -265,7 +291,7 @@ int main (int argc, char *argv[])
 			**************************
 		*/
 
-		// Create a BulkSendApplication and install it on 2nd reciever
+		// Create a BulkSendApplication and install it on HOST 2
 	    port = 12344;
 	    BulkSendHelper source ("ns3::TcpSocketFactory",InetSocketAddress (i3i5.GetAddress (1), port));
 	    // Set the amount of data to send in bytes.  Zero is unlimited.
@@ -285,7 +311,7 @@ int main (int argc, char *argv[])
 		}
 
 	    
-	    // Create a PacketSinkApplication and install it on node 1
+	    // Create a PacketSinkApplication and install it on HOST-4
 	    PacketSinkHelper sink_tcp ("ns3::TcpSocketFactory",InetSocketAddress (Ipv4Address::GetAny (), port));
 	    ApplicationContainer tcp_apps_d = sink_tcp.Install (n3n5.Get (1));
 
@@ -386,13 +412,9 @@ int main (int argc, char *argv[])
 				std::cout<<std::endl;
 			}
 		}
-		// std::cout<<"command line Arguments\n";		
-	 //    std::cout<<"packetsize: "<<packetsize<<"\n";
-	 //    std::cout<<"prot: "<<prot<<"\n";
-	 //    std::cout<<"run time: "<<run_time<<"\n";
-	 //    std::cout<<"for_loop: "<<for_loop<<"\n";
-	 //    std::cout<<"simultaneously: "<<simultaneously<<"\n";
-	 //    std::cout<<"Run "<<i<<"finished\n";
+
+		std::cout<<"Run: "<<i<<" finished\n";
+		
 		Simulator::Destroy ();
 	}
 
