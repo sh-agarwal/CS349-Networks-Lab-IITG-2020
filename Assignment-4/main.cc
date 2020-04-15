@@ -86,7 +86,7 @@ int main (int argc, char *argv[])
 	uint32_t port;
 	uint32_t packetsize = 1024;
 	uint32_t run_time = 1;
-	uint32_t for_loop = 5;
+	uint32_t for_loop = 2;
 
 	bool simultaneously = false;
     std::string prot = "TcpHighSpeed";
@@ -105,7 +105,10 @@ int main (int argc, char *argv[])
 	std::cout<<"prot: "<<prot<<"\n";
 	std::cout<<"run time: "<<run_time<<"\n";
 	std::cout<<"for_loop: "<<for_loop<<"\n";
-	std::cout<<"simultaneously: "<<simultaneously<<"\n";
+	std::cout<<"simultaneously: "<<simultaneously<<"\n"<<std::endl;
+	std::cout<<"**************************************************"<<std::endl;
+	std::cout<<std::endl;
+		
 	
 
 
@@ -231,6 +234,7 @@ int main (int argc, char *argv[])
 		std::cout<<"R1<--H2: "<< i1i2.GetAddress(1)<<std::endl;
 		std::cout<<"R1<--R2: "<< i2i3.GetAddress(0)<<std::endl;
 		std::cout<<"R1-->R2: "<< i2i3.GetAddress(1)<<std::endl;
+		std::cout<<std::endl;
 		
 
 		//printing routing tables for the all the nodes in the container
@@ -334,6 +338,7 @@ int main (int argc, char *argv[])
 			**************************
 		*/
 
+		//FLOW MONITOR
 		Ptr<FlowMonitor> flowmon;
 		FlowMonitorHelper flowmonHelper;
 		flowmon = flowmonHelper.InstallAll();
@@ -342,6 +347,7 @@ int main (int argc, char *argv[])
 		flowmon->CheckForLostPackets();
 
 		Ptr<Ipv4FlowClassifier> classifier = DynamicCast<Ipv4FlowClassifier>(flowmonHelper.GetClassifier());
+		//Retrieving flow montor stats for different flows
 		std::map<FlowId, FlowMonitor::FlowStats> stats = flowmon->GetFlowStats();
 		
 		double throughput_udp;
@@ -352,13 +358,13 @@ int main (int argc, char *argv[])
 		for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin(); i != stats.end(); ++i) 
 		{
 			Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow (i->first);
-			std::cout<<"asdfasdf\n";
-			std::cout<<t.sourceAddress<<"\n";
-			std::cout<<t.destinationAddress<<"\n";
+			std::cout<<"Flow: "<<i->first<<"\n";
+			std::cout<<"Source: "<<t.sourceAddress<<"\n";
+			std::cout<<"Destination: "<<t.destinationAddress<<"\n";
 
-			if(t.sourceAddress == "10.1.0.1") {
-				throughput_udp = i->second.rxBytes * 8.0 / (i->second.timeLastRxPacket.GetSeconds () - i->second.timeFirstRxPacket.GetSeconds ()) / 1000000;
-				delay_udp = i->second.delaySum.GetSeconds()/(i->second.rxPackets) ;
+			if(t.sourceAddress == "10.1.0.1") {	//UDP FLOW
+				throughput_udp = (double)i->second.rxBytes * 8.0 / (i->second.timeLastRxPacket.GetSeconds () - i->second.timeFirstRxPacket.GetSeconds ()) / (double)1000;
+				delay_udp = (double)i->second.delaySum.GetSeconds()/(i->second.rxPackets) ;
 
 				dataset_udp.Add (udpPacketSize,throughput_udp);
 				dataset_udp_delay.Add (udpPacketSize,delay_udp);
@@ -370,23 +376,17 @@ int main (int argc, char *argv[])
 				std::cout << "Rx Bytes:" << i->second.rxBytes << "\n";
 				std::cout << "Net Packet Lost: " << i->second.lostPackets << "\n";
 				std::cout << "Lost due to droppackets: " << i->second.packetsDropped.size() << "\n";
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/0/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/1/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/2/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/3/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/4/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/5/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Delay: " << i->second.delaySum.GetSeconds() << std::endl;
-				std::cout << "Mean Delay: " << i->second.delaySum.GetSeconds()/(i->second.rxPackets) << std::endl;
-				std::cout << "Offered Load: " << i->second.txBytes * 8.0 / (i->second.timeLastTxPacket.GetSeconds () - i->second.timeFirstTxPacket.GetSeconds ()) / 1000000 << " Mbps" << std::endl;
-				std::cout << "Throughput: " << i->second.rxBytes * 8.0 / (i->second.timeLastRxPacket.GetSeconds () - i->second.timeFirstRxPacket.GetSeconds ()) / 1000000 << " Mbps" << std::endl;
-				std::cout << "Mean jitter:" << i->second.jitterSum.GetSeconds () / (i->second.rxPackets - 1) << std::endl;
+				std::cout << "Total Delay(in seconds): " << i->second.delaySum.GetSeconds() << std::endl;
+				std::cout << "Mean Delay(in seconds): " << (double)i->second.delaySum.GetSeconds()/(i->second.rxPackets) << std::endl;
+				std::cout << "Offered Load: " << (double)i->second.txBytes * 8.0 / (i->second.timeLastTxPacket.GetSeconds () - i->second.timeFirstTxPacket.GetSeconds ()) / (double)1000 << " Kbps" << std::endl;
+				std::cout << "Throughput: " << (double)i->second.rxBytes * 8.0 / (i->second.timeLastRxPacket.GetSeconds () - i->second.timeFirstRxPacket.GetSeconds ()) / (double)1000 << " Kbps" << std::endl;
+				std::cout << "Mean jitter:" << (double)i->second.jitterSum.GetSeconds () / (i->second.rxPackets - 1) << std::endl;
 				std::cout<<std::endl;
 
 			} 
-			else if(t.sourceAddress == "10.1.1.1") {
-				throughput_tcp = i->second.rxBytes * 8.0 / (i->second.timeLastRxPacket.GetSeconds () - i->second.timeFirstRxPacket.GetSeconds ()) / 1000000;
-				delay_tcp = i->second.delaySum.GetSeconds()/(i->second.rxPackets);
+			else if(t.sourceAddress == "10.1.1.1") {	//TCP FLOW
+				throughput_tcp = (double)i->second.rxBytes * 8.0 / (i->second.timeLastRxPacket.GetSeconds () - i->second.timeFirstRxPacket.GetSeconds ()) / 1000;
+				delay_tcp = (double)i->second.delaySum.GetSeconds()/(i->second.rxPackets);
 				
 				dataset_tcp.Add (tcpPacketSize,throughput_tcp);
 				dataset_tcp_delay.Add(tcpPacketSize,delay_tcp);
@@ -398,22 +398,18 @@ int main (int argc, char *argv[])
 				std::cout << "Rx Bytes:" << i->second.rxBytes << "\n";
 				std::cout << "Net Packet Lost: " << i->second.lostPackets << "\n";
 				std::cout << "Lost due to droppackets: " << i->second.packetsDropped.size() << "\n";
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/0/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/1/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/2/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/3/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/4/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Max throughput: " << mapMaxThroughput["/NodeList/5/$ns3::Ipv4L3Protocol/Rx"] << std::endl;
-				std::cout << "Delay: " << i->second.delaySum.GetSeconds() << std::endl;
-				std::cout << "Mean Delay: " << i->second.delaySum.GetSeconds()/(i->second.rxPackets) << std::endl;
-				std::cout << "Offered Load: " << i->second.txBytes * 8.0 / (i->second.timeLastTxPacket.GetSeconds () - i->second.timeFirstTxPacket.GetSeconds ()) / 1000000 << " Mbps" << std::endl;
-				std::cout << "Throughput: " << i->second.rxBytes * 8.0 / (i->second.timeLastRxPacket.GetSeconds () - i->second.timeFirstRxPacket.GetSeconds ()) / 1000000 << " Mbps" << std::endl;
-				std::cout << "Mean jitter:" << i->second.jitterSum.GetSeconds () / (i->second.rxPackets - 1) << std::endl;
+				std::cout << "Total Delay(in seconds): " << i->second.delaySum.GetSeconds() << std::endl;
+				std::cout << "Mean Delay(in secinds): " << (double)i->second.delaySum.GetSeconds()/(i->second.rxPackets) << std::endl;
+				std::cout << "Offered Load: " << (double)i->second.txBytes * 8.0 / (i->second.timeLastTxPacket.GetSeconds () - i->second.timeFirstTxPacket.GetSeconds ()) / (double)1000 << " Kbps" << std::endl;
+				std::cout << "Throughput: " << (double)i->second.rxBytes * 8.0 / (i->second.timeLastRxPacket.GetSeconds () - i->second.timeFirstRxPacket.GetSeconds ()) / (double)1000 << " Kbps" << std::endl;
+				std::cout << "Mean jitter:" << (double)i->second.jitterSum.GetSeconds () / (i->second.rxPackets - 1) << std::endl;
 				std::cout<<std::endl;
 			}
 		}
 
-		std::cout<<"Run: "<<i<<" finished\n";
+		std::cout<<"Run: "<<i<<" finished\n"<<std::endl;
+		std::cout<<"**************************************************"<<std::endl;
+		std::cout<<std::endl;
 		
 		Simulator::Destroy ();
 	}
