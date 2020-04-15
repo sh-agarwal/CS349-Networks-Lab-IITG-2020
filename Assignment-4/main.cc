@@ -458,17 +458,17 @@ int main (int argc, char *argv[])
 	// plotted along with connecting lines.
 	dataset_tcp.SetTitle ("Throughput FTP over TCP");
 	dataset_tcp.SetStyle (Gnuplot2dDataset::LINES_POINTS);
-	dataset_tcp.SetExtra ("lw 3");
+	dataset_tcp.SetExtra ("lw 2");
 	dataset_udp.SetTitle ("Throughput CBR over UDP");
 	dataset_udp.SetStyle (Gnuplot2dDataset::LINES_POINTS);
-	dataset_udp.SetExtra ("lw 3");
+	dataset_udp.SetExtra ("lw 2");
 	
 	dataset_tcp_delay.SetTitle ("Delay FTP over TCP");
 	dataset_tcp_delay.SetStyle (Gnuplot2dDataset::LINES_POINTS);
-	dataset_tcp_delay.SetExtra ("lw 3");
+	dataset_tcp_delay.SetExtra ("lw 2");
 	dataset_udp_delay.SetTitle ("Delay CBR over UDP");
 	dataset_udp_delay.SetStyle (Gnuplot2dDataset::LINES_POINTS);
-	dataset_udp_delay.SetExtra ("lw 3");
+	dataset_udp_delay.SetExtra ("lw 2");
 
 	// double x;
 	// double y;
