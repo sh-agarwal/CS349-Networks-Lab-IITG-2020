@@ -38,5 +38,5 @@ sudo apt install gnuplot
 ./waf --run "scratch/main --prot=TcpScalable --for_loop=40 --simultaneously=1 --offset=2 --run_time=1 --packetsize=1024" 
 (Put the values accordingly in the fields above)
 
-4)Plot the graph from generated "x.plt" file:
+4) Plot the graph from generated "x.plt" file:
 gnuplot x.plt
