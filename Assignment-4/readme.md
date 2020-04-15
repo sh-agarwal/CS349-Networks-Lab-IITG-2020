@@ -1,4 +1,4 @@
-CS349 ASSIGNMENT 4 (QUESTION-6) 2020
+<h2>CS349 ASSIGNMENT 4 (QUESTION-6) 2020</h2>
 
 Q: The objective is to compare the effect of CBR traffic over UDP agent and FTP traffic over TCP agent. Consider a
 TCP agent from TCP HighSpeed, TCP Vegas and TCP Scalable for the FTP traffic. Consider a Dumbbell topology
@@ -15,28 +15,33 @@ observed with different packet sizes.
 2. Start both the flows at the same time and also at different times. Also, compare the delay (in sec) and
 throughput (in Kbps) of CBR and FTP traffic streams. Plot the graphs for the delay (in sec) and
 throughput (in Kbps) observed with different packet sizes.
+</br>
+
+![alt text][logo]
+
+[logo]: https://i.ibb.co/NWL7BNL/dia.png "Diagram"
 
 ********************************************************************************************************************
 
-Authors:
+**Authors:**
 
-170101087: SIDDHARTH AGARWAL\n
-170101036: MANI MANNAMPALLI 
-170101068: SUNNY KUMAR
+170101087: SIDDHARTH AGARWAL</br>
+170101036: MANI MANNAMPALLI </br>
+170101068: SUNNY KUMAR</br>
 
 ********************************************************************************************************************
 
-How to RUN?
+**How to RUN?**
 
-1) Install ns-3 with other modules and libraries. Detailed Installation steps can be found at: 
+1) Install ns-3 with other modules and libraries. Detailed Installation steps can be found at: \
 https://www.youtube.com/playlist?list=PLRAV69dS1uWQEbcHnKbLldvzrjdOcOIdY
 
-2) Install gnuplot:
+2) Install gnuplot:\
 sudo apt install gnuplot
 
-3) Template for running main.cc (It should be inside scratch folder):
-./waf --run "scratch/main --prot=TcpScalable --for_loop=40 --simultaneously=1 --offset=2 --run_time=1 --packetsize=1024" 
+3) Template for running main.cc (It should be inside scratch folder):\
+./waf --run "scratch/main --prot=TcpScalable --for_loop=40 --simultaneously=1 --offset=2 --run_time=1 --packetsize=1024" \
 (Put the values accordingly in the fields above)
 
-4) Plot the graph from generated "x.plt" file:
+4) Plot the graph from generated "x.plt" file:\
 gnuplot x.plt
