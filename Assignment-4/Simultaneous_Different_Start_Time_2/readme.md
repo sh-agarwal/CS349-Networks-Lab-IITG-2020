@@ -1,0 +1,1 @@
+FTP over TCP has an Offset of +2 seconds compared to UDP CBR.
