@@ -86,7 +86,7 @@ int main (int argc, char *argv[])
 	uint32_t port;
 	uint32_t packetsize = 1024;
 	uint32_t run_time = 1;
-	uint32_t for_loop = 2;
+	uint32_t for_loop = 10;
 
 	bool simultaneously = false;
     std::string prot = "TcpHighSpeed";
@@ -414,16 +414,18 @@ int main (int argc, char *argv[])
 		Simulator::Destroy ();
 	}
 
-	std::string simultaneously_str = std::to_string(simultaneously);
-	std::string fileNameWithNoExtension = prot+simultaneously_str;
-	std::string graphicsFileName        = fileNameWithNoExtension + ".png";
+	std::string simultaneously_str="Seperate";
+	if(simultaneously)
+		simultaneously_str="Simultaneous";
+	std::string fileNameWithNoExtension = prot+"_throughput_"+simultaneously_str;
+	std::string graphicsFileName        = fileNameWithNoExtension + ".pdf";
 	std::string plotFileName            = fileNameWithNoExtension + ".plt";
-	std::string plotTitle               = prot + "vs UDP throughput";
+	std::string plotTitle               = prot + " vs UDP throughput";
 	
-	std::string fileNameWithNoExtension_delay = prot+"_delay"+simultaneously_str;
-	std::string graphicsFileName_delay        = fileNameWithNoExtension_delay + ".png";
+	std::string fileNameWithNoExtension_delay = prot+"_delay_"+simultaneously_str;
+	std::string graphicsFileName_delay        = fileNameWithNoExtension_delay + ".pdf";
 	std::string plotFileName_delay            = fileNameWithNoExtension_delay + ".plt";
-	std::string plotTitle_delay               = prot + "vs UDP delay";
+	std::string plotTitle_delay               = prot + " vs UDP delay";
 
 	// Instantiate the plot and set its title.
 	Gnuplot plot (graphicsFileName);
@@ -433,12 +435,12 @@ int main (int argc, char *argv[])
 	plot_delay.SetTitle (plotTitle_delay);
 
 	// Make the graphics file, which the plot file will create when it
-	// is used with Gnuplot, be a PNG file.
-	plot.SetTerminal ("png");
-	plot_delay.SetTerminal ("png");
+	// is used with Gnuplot, be a PDF file
+	plot.SetTerminal ("pdf");
+	plot_delay.SetTerminal ("pdf");
 
 	// Set the labels for each axis.
-	plot.SetLegend ("Packet Size(in Bytes)", "Throughput Values(in mbps)");
+	plot.SetLegend ("Packet Size(in Bytes)", "Throughput Values(in Kbps)");
 	plot_delay.SetLegend ("Packet Size(in Bytes)", "Delay(in s)");
 
 	// Set the range for the x axis.
@@ -448,13 +450,17 @@ int main (int argc, char *argv[])
 	// plotted along with connecting lines.
 	dataset_tcp.SetTitle ("Throughput FTP over TCP");
 	dataset_tcp.SetStyle (Gnuplot2dDataset::LINES_POINTS);
+	dataset_tcp.SetExtra ("lw 3");
 	dataset_udp.SetTitle ("Throughput CBR over UDP");
 	dataset_udp.SetStyle (Gnuplot2dDataset::LINES_POINTS);
+	dataset_udp.SetExtra ("lw 3");
 	
 	dataset_tcp_delay.SetTitle ("Delay FTP over TCP");
 	dataset_tcp_delay.SetStyle (Gnuplot2dDataset::LINES_POINTS);
+	dataset_tcp_delay.SetExtra ("lw 3");
 	dataset_udp_delay.SetTitle ("Delay CBR over UDP");
 	dataset_udp_delay.SetStyle (Gnuplot2dDataset::LINES_POINTS);
+	dataset_udp_delay.SetExtra ("lw 3");
 
 	// double x;
 	// double y;
