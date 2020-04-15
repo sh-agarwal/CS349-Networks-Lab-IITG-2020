@@ -86,7 +86,8 @@ int main (int argc, char *argv[])
 	uint32_t port;
 	uint32_t packetsize = 1024;
 	uint32_t run_time = 1;
-	uint32_t for_loop = 10;
+	uint32_t for_loop = 1;
+	uint32_t offset=0;
 
 	bool simultaneously = false;
     std::string prot = "TcpHighSpeed";
@@ -97,6 +98,7 @@ int main (int argc, char *argv[])
     cmd.AddValue ("for_loop", "no of for loop runs", for_loop);
     cmd.AddValue ("run_time", "run_time in factor of 5", run_time);
     cmd.AddValue ("simultaneously", "run_time in factor of 5", simultaneously);
+    cmd.AddValue ("offset", "offset for different start times", offset);
 
     cmd.Parse (argc, argv);
 
@@ -105,6 +107,7 @@ int main (int argc, char *argv[])
 	std::cout<<"prot: "<<prot<<"\n";
 	std::cout<<"run time: "<<run_time<<"\n";
 	std::cout<<"for_loop: "<<for_loop<<"\n";
+	std::cout<<"Offset: "<<offset<<"\n";
 	std::cout<<"simultaneously: "<<simultaneously<<"\n"<<std::endl;
 	std::cout<<"**************************************************"<<std::endl;
 	std::cout<<std::endl;
@@ -326,8 +329,8 @@ int main (int argc, char *argv[])
 		}
 		else
 		{
-			tcp_apps_d.Start (Seconds ((0.0+(10*i))*run_time) );
-	    	tcp_apps_d.Stop (Seconds ((10.0+(10*i))*run_time) );	
+			tcp_apps_d.Start (Seconds ((0.0+(10*i))*run_time+offset ));
+	    	tcp_apps_d.Stop (Seconds ((10.0+(10*i))*run_time+offset) );	
 		}
 	    // tcpSink = DynamicCast<PacketSink> (sinkApps.Get (0));
 
@@ -342,7 +345,10 @@ int main (int argc, char *argv[])
 		Ptr<FlowMonitor> flowmon;
 		FlowMonitorHelper flowmonHelper;
 		flowmon = flowmonHelper.InstallAll();
+		if(!simultaneously)
 		Simulator::Stop(Seconds((10+(10*i))*run_time) );
+		else
+		Simulator::Stop(Seconds((10+(10*i))*run_time+offset) );
 		Simulator::Run();
 		flowmon->CheckForLostPackets();
 
@@ -415,8 +421,10 @@ int main (int argc, char *argv[])
 	}
 
 	std::string simultaneously_str="Seperate";
-	if(simultaneously)
-		simultaneously_str="Simultaneous";
+	if(simultaneously&&offset==0)
+		simultaneously_str="Simultaneous_Same_Start";
+	else if(simultaneously&&offset!=0)
+		simultaneously_str="Simultaneous_Different_Start";
 	std::string fileNameWithNoExtension = prot+"_throughput_"+simultaneously_str;
 	std::string graphicsFileName        = fileNameWithNoExtension + ".pdf";
 	std::string plotFileName            = fileNameWithNoExtension + ".plt";
