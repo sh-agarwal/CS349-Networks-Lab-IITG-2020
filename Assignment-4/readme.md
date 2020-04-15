@@ -20,7 +20,7 @@ throughput (in Kbps) observed with different packet sizes.
 
 Authors:
 
-170101087: SIDDHARTH AGARWAL 
+170101087: SIDDHARTH AGARWAL\n
 170101036: MANI MANNAMPALLI 
 170101068: SUNNY KUMAR
 
